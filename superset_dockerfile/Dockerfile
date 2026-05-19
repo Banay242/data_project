@@ -5,20 +5,11 @@ USER root
 # Обновление pip
 RUN pip install --upgrade pip
 
-# Установка clickhouse коннектора
-RUN pip install clickhouse-connect
+# Копируем файл зависимостей внутрь контейнера
+COPY requirements.txt /app/requirements.txt
 
-# Установка системных зависимостей
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
-    python3-dev \
-    pkg-config && \
-    rm -rf /var/lib/apt/lists/*  # Очистка кэша apt
-
-# Установка Python-пакетов
-RUN pip install mysqlclient
+# Устанавливаем все пакеты одной командой из файла
+RUN pip install -r /app/requirements.txt
 
 ENV ADMIN_USERNAME=${ADMIN_USERNAME}
 ENV ADMIN_EMAIL=${ADMIN_EMAIL}
