@@ -34,6 +34,20 @@ x-airflow-common: &airflow-common
     - all_in_one
 
 services:
+  postgres_dwh:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER_DWH}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_DWH}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-dwh-volume:/var/lib/postgresql/data #добавил чтобы данные сохранялись при перезапуске контейнера
+    restart: always
+    ports:
+      - "5432:5432"
+    networks:
+      - all_in_one
+
   postgres:
     image: postgres:15
     environment:
@@ -41,7 +55,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     command: ["postgres", "-c", "wal_level=logical"]
     ports:
-      - "5432:5432"
+      - "5433:5432"
     restart: always
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
@@ -67,8 +81,8 @@ services:
       CLICKHOUSE_USER: ${CLICKHOUSE_USER}
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
     ports:
-      - "8123:8123"
-      - "9000:9000"
+      - "8124:8123"
+      - "9004:9000"
     volumes:
       - ./clickhouse:/var/lib/clickhouse
       - ./data_lake:/opt/data_lake
@@ -170,6 +184,7 @@ services:
       GRANT_SUDO: yes
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      JUPYTER_RUNTIME_DIR: /tmp/jupyter_runtime
     user: root
     restart: always
     networks:
@@ -335,6 +350,7 @@ services:
         DS_PROMETHEUS: prometheus
 
 volumes:
+  postgres-dwh-volume:
   postgres-db-volume:
   clickhouse:
 
