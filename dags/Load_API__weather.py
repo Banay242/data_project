@@ -25,7 +25,7 @@ def fetch_weather_and_upload_s3hook():
     data = response.json()
 
     # Генерируем имя файла
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     filename = f"api/weather/moscow_{timestamp}.json"
 
     # Используем S3Hook

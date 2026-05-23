@@ -1,18 +1,16 @@
 import logging
 import pendulum
+import os
 
 from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-from airflow.sensors.external_task import ExternalTaskSensor
 
-from sqlalchemy.sql.functions import mode
 
 logger = logging.getLogger(__name__)
 # конфиги дага
 OWNER = 'n_bainin'
-DAG_ID = 'nik__spark__earthquake__raw__daily'
-#spark
-SPARK_CONN = "spark_default"
+DAG_ID = 'nik__streaming__order_events__daily'
+SPARK_CONN = 'spark_default'
 MINIO_CONN = "minios3_conn"
 
 LONG_DESCRIPTION = """
@@ -24,44 +22,31 @@ args = {
     'start_date': pendulum.datetime(2026, 5, 1, tz='Europe/Moscow'),
     'retries': 3,
     'retry_delay': pendulum.duration(hours=1),
-    'catchup': True,
+    'catchup': False,
 }
+
 
 with DAG(
     dag_id=DAG_ID,
-    schedule='0 6 * * *',
     default_args=args,
-    description=SHORT_DESCRIPTION,
-    max_active_runs=1
+    schedule=None,
+    tags=['spark', 'streaming', 'click']
 ) as dag:
     dag.doc_md = LONG_DESCRIPTION
 
-    target_date = "{{ data_interval_start.format('YYYY-MM-DD') }}"
-
-    wait_for_s3_task = ExternalTaskSensor(
-        task_id='wait_fot_s3',
-        external_dag_id='api__earthquake__raw__daily',
-        external_task_id=None,
-        allowed_states=['success'],
-        mode='reschedule',
-        poke_interval=60,
-        timeout=60 * 60 * 6,
-        execution_delta=pendulum.duration(hours=1),
-    )
-
-    run_spark_task = SparkSubmitOperator(
-        task_id='run_spark',
-        application="/opt/airflow/scripts/spark_jobs__nik/transform__nik/transform__earthquakes.py",
+    stream_kafka_to_s3_task = SparkSubmitOperator(
+        task_id='stream_kafka_to_s3',
+        application='/opt/airflow/scripts/spark_jobs__nik/load__nik/load__order_events.py',
         conn_id=SPARK_CONN,
         application_args=[
             "--target_date", "{{ ds }}",
-            "--jdbc-url", "jdbc:clickhouse://{{ conn.clickhouse_dm.host }}:{{ conn.clickhouse_dm.port }}/{{ conn.clickhouse_dm.schema }}",
-            "--db-user", "{{ conn.clickhouse_dm.login }}",
-            "--db-password", "{{ conn.clickhouse_dm.password }}",
-            "--table-name", "earthquakes"
+            "--s3_path", f's3a://{os.getenv("MINIO_PROD_BUCKET_NAME")}/stream/order_events/',
+            "--kafka_topic", 'backend.public.order_events',
+            "--kafka_bootstrap", 'kafka:29093'
         ],
         conf={
             "spark.jars.packages": (
+                "org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.4,"
                 "org.apache.hadoop:hadoop-aws:3.3.4,"
                 "com.amazonaws:aws-java-sdk-bundle:1.11.1026,"
                 "org.postgresql:postgresql:42.5.0,"
@@ -75,14 +60,10 @@ with DAG(
             "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
 
             "spark.driver.memory": "2g",
-            #"spark.executor.instances": "10",
+            # "spark.executor.instances": "10",
             # "spark.executor.memory": "10g",
             "spark.executor.cores": "5"
-        },
-        verbose=True
+        }
     )
 
-    wait_for_s3_task >> run_spark_task
-
-
-
+    stream_kafka_to_s3_task

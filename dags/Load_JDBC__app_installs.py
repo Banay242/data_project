@@ -43,7 +43,7 @@ jdbc_to_s3 = SparkSubmitOperator(
         "spark.hadoop.fs.s3a.connection.ssl.enabled": "false"
     },
     packages=(
-        "org.apache.hadoop:hadoop-aws:3.3.2,"
+        "org.apache.hadoop:hadoop-aws:3.3.4,"
         "com.amazonaws:aws-java-sdk-bundle:1.11.1026,"
         "org.postgresql:postgresql:42.5.0"
     ),
