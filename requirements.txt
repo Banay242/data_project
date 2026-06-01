@@ -10,3 +10,4 @@ psycopg2-binary
 faker
 dbt-core
 dbt-clickhouse
+kafka-python==2.0.2
