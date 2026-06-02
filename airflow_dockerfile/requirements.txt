@@ -2,8 +2,9 @@ airflow-providers-clickhouse==0.0.1
 apache-airflow-providers-apache-spark==4.11.1
 pandas
 requests==2.31.0
-pyspark
+pyspark==3.3.4
 dbt-core
 dbt-clickhouse
 faker
 psycopg2-binary
+kafka-python==2.0.2

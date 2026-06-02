@@ -1,1 +1,8 @@
-pyspark
+pyspark==3.4.1
+boto3==1.34.80
+clickhouse-connect==0.7.15
+# Бинарный драйвер Postgres для аналитики и проверки метаданных Airflow/DWH
+psycopg2-binary==2.9.9
+pandas==2.0.3
+# Библиотека для работы с бинарными форматами (нужна Spark для ускорения toPandas)
+pyarrow==14.0.1netsh interface portproxy delete v4tov4 listenport=10809 listenaddress=0.0.0.0

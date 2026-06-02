@@ -1,0 +1,13 @@
+apache-airflow
+apache-airflow-providers-apache-spark==4.11.1
+apache-airflow-providers-postgres
+apache-airflow-providers-amazon
+airflow-providers-clickhouse==0.0.1
+pandas
+requests==2.31.0
+pyspark==3.3.4
+psycopg2-binary
+faker
+dbt-core
+dbt-clickhouse
+kafka-python==2.0.2

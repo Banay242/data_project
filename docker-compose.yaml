@@ -80,11 +80,12 @@ services:
     environment:
       CLICKHOUSE_USER: ${CLICKHOUSE_USER}
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_INIT_TIMEOUT: 120
     ports:
-      - "8124:8123"
-      - "9004:9000"
+      - "8125:8123"
+      - "9005:9000"
     volumes:
-      - ./clickhouse:/var/lib/clickhouse
+      - clickhouse:/var/lib/clickhouse
       - ./data_lake:/opt/data_lake
       - ./docker_related_config.xml:/etc/clickhouse-server/config.d/docker_related_config.xml
       - ./clickhouse/init:/docker-entrypoint-initdb.d

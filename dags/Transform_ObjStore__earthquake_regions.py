@@ -44,7 +44,7 @@ s3_to_ch = SparkSubmitOperator(
         "spark.hadoop.fs.s3a.connection.ssl.enabled": "false"
     },
     packages=(
-        "org.apache.hadoop:hadoop-aws:3.3.2,"
+        "org.apache.hadoop:hadoop-aws:3.3.4,"
         "com.amazonaws:aws-java-sdk-bundle:1.11.1026,"
         "ru.yandex.clickhouse:clickhouse-jdbc:0.3.2"
     ),
