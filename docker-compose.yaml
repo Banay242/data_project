@@ -350,11 +350,35 @@ services:
       environment:
         DS_PROMETHEUS: prometheus
 
+  greenplum:
+    build:
+      context: ./greenplum_dockerfile
+      dockerfile: Dockerfile
+    container_name: greenplum
+    ports:
+      - "5434:5432" # Пробрасываем на 5434, так как 5432 и 5433 уже заняты
+    environment:
+      - POSTGRES_USER=${GREENPLUM_USER:-gpadmin}
+      - POSTGRES_PASSWORD=${GREENPLUM_PASSWORD:-gpadmin}
+      - POSTGRES_DB=${GREENPLUM_DB:-dev}
+    volumes:
+      - greenplum-data:/var/lib/greenplum
+    command: >
+      /bin/sh -c '/app/start_greenplum.sh &&
+      su - gpadmin -c "psql -d template1 -c \"ALTER USER gpadmin PASSWORD '\''$${POSTGRES_PASSWORD}'\'';\"" &&
+      su - gpadmin -c "createdb $${POSTGRES_DB} || true" &&
+      /bin/bash'
+    tty: true
+    stdin_open: true
+    restart: always
+    networks:
+      - all_in_one
+
 volumes:
   postgres-dwh-volume:
   postgres-db-volume:
   clickhouse:
-
+  greenplum-data:
 
 networks:
   all_in_one:
