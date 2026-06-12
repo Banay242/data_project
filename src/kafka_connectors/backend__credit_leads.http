@@ -1,0 +1,40 @@
+PUT http://localhost:8083/connectors/credit-leads-cdc/config
+Content-Type: application/json
+
+{
+  "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+  "plugin.name": "pgoutput",
+
+  "database.hostname": "postgres_dwh",
+  "database.port": "5432",
+  "database.user": "postgres",
+  "database.password": "${POSTGRES_PASSWORD_DWH}", 
+  "database.dbname": "${POSTGRES_DB}",
+  "database.server.name": "postgres_dwh",
+
+  "slot.name": "credit_leads_slot",
+  "publication.name": "credit_leads_pub",
+  "publication.autocreate.mode": "filtered",
+
+  "table.include.list": "public.dbz_signal,public.dbz_heartbeat,ods.credit_leads",
+  "snapshot.mode": "initial",
+
+  "signal.enabled.channels": "source,kafka",
+  "signal.data.collection": "public.dbz_signal",
+  "signal.kafka.bootstrap.servers": "kafka:29093",
+  "signal.kafka.topic": "pg_cdc.signal",
+
+  "heartbeat.interval.ms": "10000",
+  "heartbeat.action.query": "INSERT INTO public.dbz_heartbeat (id, ts) VALUES (1, NOW()) ON CONFLICT(id) DO UPDATE SET ts=EXCLUDED.ts;",
+
+  "topic.prefix": "pg_cdc",
+  "tombstones.on.delete": "false",
+
+  "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "key.converter.schemas.enable": "false",
+
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter.schemas.enable": "false",
+
+  "include.before.state": "true"
+}
