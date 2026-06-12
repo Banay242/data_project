@@ -11,3 +11,4 @@ faker
 dbt-core
 dbt-clickhouse
 kafka-python==2.0.2
+pyarrow==21.0.0

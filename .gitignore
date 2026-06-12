@@ -13,6 +13,6 @@ dags/.DS_Store
 s3_storage/
 temp/
 venv/
-
-
+clickhouse_logs
+.env
 
