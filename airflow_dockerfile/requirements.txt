@@ -9,3 +9,4 @@ faker
 psycopg2-binary
 kafka-python==2.0.2
 pyarrow==21.0.0
+psycopg2
