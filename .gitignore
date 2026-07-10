@@ -15,4 +15,7 @@ temp/
 venv/
 clickhouse_logs
 .env
+.ai
+/test_logs
+/synthetic_data
 
